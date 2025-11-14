@@ -39,7 +39,7 @@ class EmployeeForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = 'EMPLOYEE'
+        user.role = self.cleaned_data.get('role') or 'EMPLOYEE'
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
