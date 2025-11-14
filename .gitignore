@@ -1,0 +1,41 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+# Python
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations (optional - uncomment if needed)
+# */migrations/*.py
+# !*/migrations/__init__.py

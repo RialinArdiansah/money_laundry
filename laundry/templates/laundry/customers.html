@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h1 class="text-blue">Data Pelanggan</h1>
+    <p class="text-muted">Kelola data pelanggan laundry</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Daftar Pelanggan</h2>
+        <input type="text" class="form-control w-auto" placeholder="Cari pelanggan..." data-table-search="customersTable">
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="customersTable">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Alamat</th>
+                <th>Nomor HP</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in customers %}
+              <tr>
+                <td><strong>{{ c.name }}</strong></td>
+                <td>{{ c.address }}</td>
+                <td>{{ c.phone }}</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="/pelanggan/{{ c.pk }}/edit/" class="btn btn-primary btn-sm" data-tooltip="Edit pelanggan">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/order/new/?customer={{ c.pk }}" class="btn btn-warning btn-sm" data-tooltip="Buat pesanan untuk pelanggan ini">
+                      <i class="bi bi-plus"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-4">
+                  <div class="text-muted">Belum ada data pelanggan</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="mb-0">Tambah Pelanggan</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" id="customerForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nama</label>
+            {{ form.name }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Alamat</label>
+            {{ form.address }}
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Nomor HP</label>
+            {{ form.phone }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning" data-tooltip="Simpan data pelanggan">
+              <i class="bi bi-save"></i> Simpan
+            </button>
+            <a href="/pelanggan/" class="btn btn-secondary">Batal</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

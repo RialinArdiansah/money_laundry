@@ -1,0 +1,137 @@
+/* Modal Tambah Pelanggan Styles */
+#addCustomerModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+}
+
+#addCustomerModal .modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+#addCustomerModal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+#addCustomerModal .btn-close:hover {
+    opacity: 1;
+}
+
+#addCustomerModal .modal-body {
+    padding: 1.5rem;
+}
+
+#addCustomerModal .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#addCustomerModal .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+#addCustomerModal .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+#addCustomerModal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#addCustomerModal .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.5rem 1rem rgba(102, 126, 234, 0.4);
+}
+
+#addCustomerModal .btn-secondary {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#addCustomerModal .btn-secondary:hover {
+    transform: translateY(-1px);
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    #addCustomerModal .modal-body {
+        padding: 1rem;
+    }
+    
+    #addCustomerModal .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    #addCustomerModal .btn {
+        width: 100%;
+    }
+}
+
+/* Animation for modal */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Success animation */
+@keyframes successPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+.success-animation {
+    animation: successPulse 1s ease-out;
+}
+
+/* Toast Styles */
+.toast-container {
+    z-index: 1055;
+}
+
+.toast {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+}
+
+.toast-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.toast-body {
+    padding: 1rem;
+    font-weight: 500;
+}

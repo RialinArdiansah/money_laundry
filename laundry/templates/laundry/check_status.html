@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card">
+      <div class="card-header text-center">
+        <h1 class="mb-0">Cek Status Laundry</h1>
+      </div>
+      <div class="card-body">
+        <form method="post" id="statusForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nomor Order</label>
+            <input type="text" name="order_number" value="{{ order_number }}" class="form-control" placeholder="Mis. MLABC123456" required>
+          </div>
+          <button type="submit" class="btn btn-warning w-100" data-tooltip="Cari status laundry">
+            <i class="bi bi-search"></i> Cari
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if result %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="mb-0">Hasil Pencarian</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>Nama Pelanggan:</strong>
+            <p class="mb-0">{{ result.customer.name }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Jenis Layanan:</strong>
+            <p class="mb-0">{{ result.get_service_type_display }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Berat Cucian:</strong>
+            <p class="mb-0">{{ result.weight_kg }} kg</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Tanggal Diterima:</strong>
+            <p class="mb-0">{{ result.date_in|date:"d M Y" }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Estimasi Selesai:</strong>
+            <p class="mb-0">{{ result.estimated_done|date:"d M Y" }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Status Pesanan:</strong>
+            <p class="mb-0">
+              <span class="status-badge status-{{ result.status|lower }}">
+                {{ result.get_status_display }}
+              </span>
+            </p>
+          </div>
+          {% if result.storage_deadline %}
+          <div class="col-12 mb-3">
+            <strong>Batas Penyimpanan:</strong>
+            <p class="mb-0">{{ result.storage_deadline|date:"d M Y" }}</p>
+          </div>
+          {% endif %}
+          {% if result.notes %}
+          <div class="col-12 mb-3">
+            <strong>Catatan Tambahan:</strong>
+            <p class="mb-0">{{ result.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

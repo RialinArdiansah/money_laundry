@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h1 class="text-blue">Data Pegawai</h1>
+    <p class="text-muted">Kelola data pegawai laundry</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Daftar Pegawai</h2>
+        <input type="text" class="form-control w-auto" placeholder="Cari pegawai..." data-table-search="employeesTable">
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="employeesTable">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Username</th>
+                <th>Jabatan</th>
+                <th>Nomor HP</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for employee in employees %}
+              <tr>
+                <td><strong>{{ employee.get_full_name|default:employee.username }}</strong></td>
+                <td>{{ employee.username }}</td>
+                <td>
+                  <span class="badge {% if employee.role == 'OWNER' %}bg-danger{% else %}bg-primary{% endif %}">
+                    {{ employee.get_role_display }}
+                  </span>
+                </td>
+                <td>{{ employee.phone|default:"-" }}</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="/pegawai/{{ employee.pk }}/edit/" class="btn btn-primary btn-sm" data-tooltip="Edit pegawai">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/pegawai/{{ employee.pk }}/delete/" class="btn btn-danger btn-sm" data-tooltip="Hapus pegawai" onclick="return confirm('Apakah Anda yakin ingin menghapus pegawai ini?')">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <div class="text-muted">Belum ada data pegawai</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="mb-0">Tambah Pegawai Baru</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" id="employeeForm">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nama Depan</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nama Belakang</label>
+              {{ form.last_name }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            {{ form.password }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Jabatan</label>
+            {{ form.role }}
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Nomor HP</label>
+            {{ form.phone }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning" data-tooltip="Simpan data pegawai">
+              <i class="bi bi-save"></i> Simpan
+            </button>
+            <a href="/pegawai/" class="btn btn-secondary">Batal</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h1 class="text-blue">Dashboard Owner</h1>
+    <p class="text-muted">Selamat datang, {{ user.get_full_name|default:user.username }}!</p>
+  </div>
+</div>
+
+<div class="row g-3 g-md-4">
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="/order/new/" class="dashboard-card text-decoration-none h-100" data-tooltip="Buat pesanan laundry baru">
+      <div class="icon">🧺</div>
+      <h3>Order Laundry</h3>
+      <p class="text-truncate-2">Buat pesanan baru</p>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="/pelanggan/" class="dashboard-card text-decoration-none h-100" data-tooltip="Kelola data pelanggan">
+      <div class="icon">👥</div>
+      <h3>Data Pelanggan</h3>
+      <p class="text-truncate-2">Kelola pelanggan</p>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="/transaksi/" class="dashboard-card text-decoration-none h-100" data-tooltip="Lihat laporan transaksi">
+      <div class="icon">📊</div>
+      <h3>Laporan Transaksi</h3>
+      <p class="text-truncate-2">Lihat semua transaksi</p>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="/pegawai/" class="dashboard-card text-decoration-none h-100" data-tooltip="Kelola data pegawai">
+      <div class="icon">👔</div>
+      <h3>Data Pegawai</h3>
+      <p class="text-truncate-2">Kelola pegawai</p>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="/laporan-bulanan/" class="dashboard-card text-decoration-none h-100" data-tooltip="Lihat laporan transaksi bulanan">
+      <div class="icon">📈</div>
+      <h3>Laporan Bulanan</h3>
+      <p class="text-truncate-2">Analisis keuangan & transaksi</p>
+    </a>
+  </div>
+</div>
+{% endblock %}

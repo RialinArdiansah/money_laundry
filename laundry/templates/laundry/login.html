@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card">
+      <div class="card-header text-center">
+        <h1 class="mb-0">Login</h1>
+      </div>
+      <div class="card-body">
+        <form method="post" id="loginForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Username/Email</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Password</label>
+            {{ form.password }}
+          </div>
+          <button type="submit" class="btn btn-warning w-100" data-tooltip="Klik untuk masuk ke sistem">
+            <i class="bi bi-box-arrow-in-right"></i> Masuk
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

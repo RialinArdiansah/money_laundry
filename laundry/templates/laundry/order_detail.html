@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load laundry_tags %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header text-center">
+        <h1 class="mb-0">🧾 Nota Transaksi</h1>
+        <small class="text-muted">Money Laundry</small>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-6">
+            <strong>Nomor Order:</strong>
+            <p class="mb-0 text-primary">{{ order.order_number }}</p>
+          </div>
+          <div class="col-6">
+            <strong>Tanggal:</strong>
+            <p class="mb-0">{{ order.date_in|date:"d M Y" }}</p>
+          </div>
+        </div>
+        
+        <hr class="my-3">
+        
+        <div class="mb-3">
+          <strong>Nama Pelanggan:</strong>
+          <p class="mb-0">{{ order.customer.name }}</p>
+        </div>
+        
+        <div class="mb-3">
+          <strong>Jenis Layanan:</strong>
+          <p class="mb-0">{{ order.get_service_type_display }}</p>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-6">
+            <strong>Berat Cucian:</strong>
+            <p class="mb-0">{{ order.weight_kg }} kg</p>
+          </div>
+          <div class="col-6">
+            <strong>Estimasi Selesai:</strong>
+            <p class="mb-0">{{ order.estimated_done|date:"d M Y" }}</p>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <strong>Status:</strong>
+          <p class="mb-0">
+            <span class="status-badge status-{{ order.status|lower }}">
+              {{ order.get_status_display }}
+            </span>
+          </p>
+        </div>
+        
+        {% if order.notes %}
+        <div class="mb-3">
+          <strong>Catatan:</strong>
+          <p class="mb-0">{{ order.notes }}</p>
+        </div>
+        {% endif %}
+        
+        <hr class="my-3">
+        
+        <div class="text-center">
+          <h4 class="text-blue">Total Biaya:</h4>
+          <h2 class="text-yellow mb-0">{{ order.total_cost|currency }}</h2>
+        </div>
+      </div>
+      <div class="card-footer text-center">
+        <button onclick="window.print()" class="btn btn-warning" data-tooltip="Cetak nota transaksi">
+          <i class="bi bi-printer"></i> Cetak Nota
+        </button>
+        <a href="/transaksi/" class="btn btn-secondary ms-2">Kembali</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/monthly_report.css">
+{% endblock %}
+{% block content %}
+<div class="monthly-report">
+<div class="row mb-4">
+  <div class="col-12">
+    <h1 class="text-blue">Laporan Transaksi Bulanan</h1>
+    <p class="text-muted">Analisis transaksi dan keuangan laundry</p>
+  </div>
+</div>
+
+<!-- Filter Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <form method="get" class="row g-3">
+          <div class="col-12 col-md-4">
+            <label for="month" class="form-label">Bulan</label>
+            <select class="form-select" id="month" name="month">
+              {% for month in months %}
+                <option value="{{ month.value }}" {% if month.selected %}selected{% endif %}>{{ month.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label for="year" class="form-label">Tahun</label>
+            <select class="form-select" id="year" name="year">
+              {% for year in years %}
+                <option value="{{ year.value }}" {% if year.selected %}selected{% endif %}>{{ year.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Tampilkan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 g-md-4 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card bg-primary text-white summary-card h-100">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="bi bi-cart-check fs-4 me-2"></i>
+          <h5 class="card-title mb-0">Total Transaksi</h5>
+        </div>
+        <h2 class="mb-1">{{ monthly_totals.total_transactions }}</h2>
+        <small class="opacity-75">{{ month_name }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card bg-success text-white summary-card h-100">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="bi bi-currency-dollar fs-4 me-2"></i>
+          <h5 class="card-title mb-0">Total Pendapatan</h5>
+        </div>
+        <h2 class="mb-1">Rp {{ monthly_totals.total_revenue|floatformat:0 }}</h2>
+        <small class="opacity-75">{{ month_name }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card bg-info text-white summary-card h-100">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="bi bi-graph-up fs-4 me-2"></i>
+          <h5 class="card-title mb-0">Rata-rata</h5>
+        </div>
+        <h2 class="mb-1">Rp {{ monthly_totals.average_per_transaction|floatformat:0 }}</h2>
+        <small class="opacity-75">per transaksi</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card bg-warning text-white summary-card h-100">
+      <div class="card-body text-center">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <i class="bi bi-check-circle fs-4 me-2"></i>
+          <h5 class="card-title mb-0">Order Selesai</h5>
+        </div>
+        <h2 class="mb-1">{{ monthly_totals.completed_count }}</h2>
+        <small class="opacity-75">{{ month_name }}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row g-3 g-md-4 mb-4">
+  <div class="col-12 col-lg-8">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Grafik Pendapatan Harian</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+          <canvas id="dailyRevenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Statistik Status Order</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Service Type Statistics -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Pendapatan per Jenis Layanan</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <canvas id="serviceChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Ringkasan Layanan</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Jenis Layanan</th>
+                <th>Jumlah</th>
+                <th>Pendapatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stat in service_stats %}
+              <tr>
+                <td>{{ stat.service_type }}</td>
+                <td>{{ stat.count }}</td>
+                <td>Rp {{ stat.revenue|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction List -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Daftar Transaksi {{ month_name }}</h5>
+        <span class="badge bg-primary">{{ monthly_totals.total_transactions }} transaksi</span>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>No. Order</th>
+                <th>Pelanggan</th>
+                <th>Tanggal</th>
+                <th>Jenis Layanan</th>
+                <th>Berat (kg)</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ order.customer.name }}</td>
+                <td>{{ order.date_in|date:"d/m/Y" }}</td>
+                <td>
+                  <span class="badge {% if order.service_type == 'EXPRESS' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ order.service_type }}
+                  </span>
+                </td>
+                <td>{{ order.weight_kg }}</td>
+                <td>Rp {{ order.total_cost|floatformat:0 }}</td>
+                <td>
+                  <span class="badge 
+                    {% if order.status == 'DITERIMA' %}bg-secondary
+                    {% elif order.status == 'PROSES' %}bg-warning
+                    {% elif order.status == 'SELESAI' %}bg-success
+                    {% elif order.status == 'SIAP_DIAMBIL' %}bg-primary
+                    {% endif %}">
+                    {{ order.status }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">Tidak ada transaksi untuk bulan ini</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Daily Revenue Chart
+const dailyCtx = document.getElementById('dailyRevenueChart').getContext('2d');
+new Chart(dailyCtx, {
+  type: 'line',
+  data: {
+    labels: {{ chart_data.daily_labels|safe }},
+    datasets: [{
+      label: 'Pendapatan Harian',
+      data: {{ chart_data.daily_revenue|safe }},
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      tension: 0.1
+    }, {
+      label: 'Jumlah Transaksi',
+      data: {{ chart_data.daily_transactions|safe }},
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      tension: 0.1,
+      yAxisID: 'y1'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        title: {
+          display: true,
+          text: 'Pendapatan (Rp)'
+        }
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: {
+          display: true,
+          text: 'Jumlah Transaksi'
+        },
+        grid: {
+          drawOnChartArea: false,
+        },
+      }
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            if (context.datasetIndex === 0) {
+              return 'Pendapatan: Rp ' + context.parsed.y.toLocaleString();
+            } else {
+              return 'Transaksi: ' + context.parsed.y;
+            }
+          }
+        }
+      }
+    }
+  }
+});
+
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+  type: 'doughnut',
+  data: {
+    labels: {{ chart_data.status_labels|safe }},
+    datasets: [{
+      data: {{ chart_data.status_counts|safe }},
+      backgroundColor: [
+        'rgba(108, 117, 125, 0.8)',
+        'rgba(255, 193, 7, 0.8)',
+        'rgba(40, 167, 69, 0.8)',
+        'rgba(0, 123, 255, 0.8)'
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }
+});
+
+// Service Chart
+const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+new Chart(serviceCtx, {
+  type: 'bar',
+  data: {
+    labels: {{ chart_data.service_labels|safe }},
+    datasets: [{
+      label: 'Pendapatan',
+      data: {{ chart_data.service_revenue|safe }},
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(54, 162, 235, 0.8)'
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Pendapatan (Rp)'
+        }
+      }
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return 'Pendapatan: Rp ' + context.parsed.y.toLocaleString();
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+</div>
+{% endblock %}

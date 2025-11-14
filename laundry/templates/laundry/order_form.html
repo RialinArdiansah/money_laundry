@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/modal_customer.css">
+{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h1 class="text-blue">Input Pesanan</h1>
+    <p class="text-muted">Buat pesanan laundry baru</p>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-12 col-md-8 mb-2 mb-md-0">
+    <form method="get" class="d-flex flex-column flex-md-row gap-2">
+      <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Filter Nama Pelanggan">
+      <button type="submit" class="btn btn-warning flex-shrink-0">Cari</button>
+    </form>
+  </div>
+  <div class="col-12 col-md-4 text-md-end">
+    <button type="button" class="btn btn-primary w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+      <i class="bi bi-plus-circle d-md-none"></i> Tambah Pelanggan
+    </button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="mb-0">Form Pesanan</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" id="orderForm">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Nama Pelanggan</label>
+              {{ form.customer }}
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Jenis Layanan</label>
+              {{ form.service_type }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Berat Cucian (kg)</label>
+              {{ form.weight_kg }}
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Tanggal Masuk Pesanan</label>
+              {{ form.date_in }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Tanggal Estimasi Selesai</label>
+              {{ form.estimated_done }}
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Catatan</label>
+              {{ form.notes }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <button type="submit" class="btn btn-warning w-100 w-md-auto" data-tooltip="Simpan pesanan laundry">
+                <i class="bi bi-save"></i> Simpan Order
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i class="bi bi-check-circle-fill text-success me-2"></i>
+      <strong class="me-auto">Sukses</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toastMessage">
+      Pelanggan berhasil ditambahkan!
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah Pelanggan -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCustomerModalLabel">Tambah Pelanggan Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addCustomerForm" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="customerName" class="form-label">Nama Pelanggan</label>
+            <input type="text" class="form-control" id="customerName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="customerPhone" class="form-label">Nomor Telepon</label>
+            <input type="text" class="form-control" id="customerPhone" name="phone" required>
+          </div>
+          <div class="mb-3">
+            <label for="customerAddress" class="form-label">Alamat</label>
+            <textarea class="form-control" id="customerAddress" name="address" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="saveCustomerBtn">Simpan Pelanggan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Fungsi untuk menampilkan toast notification
+function showToast(message, type = 'success') {
+  const toastElement = document.getElementById('successToast');
+  const toastMessage = document.getElementById('toastMessage');
+  const toastHeader = toastElement.querySelector('.toast-header');
+  
+  // Update pesan
+  toastMessage.textContent = message;
+  
+  // Update warna dan icon berdasarkan tipe
+  if (type === 'success') {
+    toastHeader.querySelector('i').className = 'bi bi-check-circle-fill text-success me-2';
+    toastHeader.querySelector('strong').textContent = 'Sukses';
+  } else if (type === 'error') {
+    toastHeader.querySelector('i').className = 'bi bi-exclamation-circle-fill text-danger me-2';
+    toastHeader.querySelector('strong').textContent = 'Error';
+  }
+  
+  // Tampilkan toast
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const saveCustomerBtn = document.getElementById('saveCustomerBtn');
+  const addCustomerForm = document.getElementById('addCustomerForm');
+  
+  saveCustomerBtn.addEventListener('click', function() {
+    // Validasi form
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+    
+    if (!name || !phone) {
+      alert('Nama dan nomor telepon wajib diisi!');
+      return;
+    }
+    
+    const formData = new FormData(addCustomerForm);
+    
+    // Disable button dan tampilkan loading
+    saveCustomerBtn.disabled = true;
+    saveCustomerBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+    
+    fetch('/api/add-customer/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Tambahkan option baru ke dropdown
+        const customerSelect = document.querySelector('select[name="customer"]');
+        const newOption = document.createElement('option');
+        newOption.value = data.customer_id;
+        newOption.textContent = data.customer_name;
+        newOption.selected = true;
+        customerSelect.appendChild(newOption);
+        
+        // Tutup modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+        modal.hide();
+        
+        // Reset form
+        addCustomerForm.reset();
+        
+        // Tampilkan pesan sukses dengan toast
+        showToast('Pelanggan berhasil ditambahkan!', 'success');
+      } else {
+        showToast('Gagal menambahkan pelanggan: ' + data.error, 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('Terjadi kesalahan saat menambahkan pelanggan.', 'error');
+    })
+    .finally(() => {
+      // Enable button kembali
+      saveCustomerBtn.disabled = false;
+      saveCustomerBtn.innerHTML = 'Simpan Pelanggan';
+    });
+  });
+});
+</script>
+{% endblock %}
