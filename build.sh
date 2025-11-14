@@ -1,11 +1,15 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Build script for Vercel deployment
 echo "Building Django static files..."
 
+# Ensure Django uses production settings during build
+export DJANGO_SETTINGS_MODULE=system_laundry.production_settings
+
 # Install Python dependencies
 if [ -f requirements.txt ]; then
+  python -m pip install --upgrade pip
   python -m pip install -r requirements.txt
 else
   echo "requirements.txt not found!"
@@ -15,7 +19,11 @@ fi
 # Create staticfiles directory
 mkdir -p staticfiles
 
-# Collect static files using production settings
-python manage.py collectstatic --noinput --settings=system_laundry.production_settings --verbosity 2
+# Collect static files
+python manage.py collectstatic --noinput --verbosity 2
+
+# List output to help Vercel verify directory is not empty
+echo "Staticfiles content:"
+ls -la staticfiles || true
 
 echo "Build completed!"
