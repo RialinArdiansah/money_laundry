@@ -16,7 +16,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0" id="employeesTable">
+          <table class="table table-hover mb-0 d-none d-md-table" id="employeesTable">
             <thead>
               <tr>
                 <th>Nama</th>
@@ -57,6 +57,44 @@
               {% endfor %}
             </tbody>
           </table>
+        </div>
+        <div class="d-md-none p-3">
+          {% for employee in employees %}
+          <div class="card mb-2">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <strong>{{ employee.get_full_name|default:employee.username }}</strong>
+                <span class="badge {% if employee.role == 'OWNER' %}bg-danger{% else %}bg-primary{% endif %}">{{ employee.get_role_display }}</span>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-12">
+                  <small class="text-muted d-block">Username</small>
+                  <span>{{ employee.username }}</span>
+                </div>
+                <div class="col-12">
+                  <small class="text-muted d-block">Nomor HP</small>
+                  <span>{{ employee.phone|default:'-' }}</span>
+                </div>
+              </div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <a href="/pegawai/{{ employee.pk }}/edit/" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-pencil"></i> Edit
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="/pegawai/{{ employee.pk }}/delete/" class="btn btn-danger btn-sm w-100" onclick="return confirm('Apakah Anda yakin?')">
+                    <i class="bi bi-trash"></i> Hapus
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-4">
+            <div class="text-muted">Belum ada data pegawai</div>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -107,4 +145,25 @@
     </div>
   </div>
 </div>
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.querySelector('[data-table-search="employeesTable"]');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const term = this.value.toLowerCase();
+      const desktopTable = document.querySelector('#employeesTable tbody');
+      if (desktopTable) {
+        desktopTable.querySelectorAll('tr').forEach(row => {
+          row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+        });
+      }
+      document.querySelectorAll('.d-md-none .card').forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(term) ? '' : 'none';
+      });
+    });
+  }
+});
+</script>
+{% endblock %}
 {% endblock %}
