@@ -56,11 +56,16 @@ CSRF_COOKIE_HTTPONLY = True
 # Database
 # For production, gunakan PostgreSQL atau database yang lebih robust
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.environ.get("PG_HOST"),
+        "PORT": os.environ.get("PG_PORT", "5432"),
+        "NAME": os.environ.get("PG_NAME"),
+        "USER": os.environ.get("PG_USER"),
+        "PASSWORD": os.environ.get("PG_PASSWORD"),
     }
 }
+
 
 # Logging
 LOGGING = {
